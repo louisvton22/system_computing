@@ -1,0 +1,49 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/1/Mux4Way16.hdl
+/**
+ * 4-way 16-bit multiplexor:
+ * out = a if sel = 00
+ *       b if sel = 01
+ *       c if sel = 10
+ *       d if sel = 11
+ */
+
+CHIP Mux4Way {
+  IN a, b, c, d, sel[2];
+  OUT out;
+  PARTS:
+    Mux(a=a, b=b, sel=sel[0], out=out1);
+    Mux(a=c, b=d, sel=sel[0], out=out2);
+    Mux(a=out1, b=out2, sel=sel[1], out=out);
+    
+}
+
+CHIP Mux8Way {
+  IN a, b, c, d, e, f, g, h sel[3];
+  OUT out;
+  PARTS:
+    Mux(a=a, b=b, sel=sel[0], out=out1);
+    Mux(a=c, b=d, sel=sel[0], out=out2);
+    Mux(a=e, b=f, sel=sel[0], out=out3);
+    Mux(a=g, b=h, sel=sel[0], out=out4);
+    Mux(a=out1, b=out2, sel=sel[1], out=out5);
+    Mux(a=out3, b=out4, sel=sel[1], out=out6);
+    Mux(a=out5, b=out6, sel=sel[2], out=out);
+}
+
+CHIP Mux4Way16 {
+    IN a[16], b[16], c[16], d[16], sel[2];
+    OUT out[16];
+    
+    PARTS:
+    Mux4Way(a=a[0..15],b=b[0..15],c=c[0..15],d=d[0..15],e=e[0..15],f=f[0..15],g=g[0..15],h=h[0..15],out=out[0..15])
+}
+
+CHIP Mux8Way16 {
+    IN a[16], b[16], c[16], d[16], e[16], f[16], g[16], h[16], sel[3];
+    OUT out[16];
+    PARTS:
+    Mux8Way(a=a[0..15],b=b[0..15],c=c[0..15],d=d[0..15],e=e[0..15],f=f[0..15],g=g[0..15],h=h[0..15],out=out[0..15])
+}
