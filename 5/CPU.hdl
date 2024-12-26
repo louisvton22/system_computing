@@ -52,5 +52,5 @@ CHIP CPU {
     And(a=jump, b=instruction[15], out=loadpc);
     Not(in=jump, out=increment);
     Or(a=not15, b=increment, out=increment2);
-    PC(in=a, load=loadpc, inc= increment2, reset=reset, out[0..14]=pc, );
+    PC(in=a, load=loadpc, inc= increment2, reset=reset, out[0..14]=pc);
 }
