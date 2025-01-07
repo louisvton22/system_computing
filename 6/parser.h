@@ -3,17 +3,27 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
+#include "symbolTable.h"
+#include <regex>
 class Parser {
 
+private:
+    
+
 public:
-    enum COMMAND_TYPE{
+
+    enum COMMAND_TYPE {
         L_COMMAND, // Label/psuedo command
         A_COMMAND, // 
         C_COMMAND
     };
-    Parser(char* filename);
 
-private:
+    Parser(char* filename);
     // Checks if there are more commands in the input
     bool hasMoreCommands();
     // Reads next command from the onput and makes it current command. Should only be called if hasMoreCommands() is true
@@ -27,7 +37,9 @@ private:
     // Returns the comp mneumonic in the current C-Command. Only called if command type is C_COMMAND
     std::string comp();
     // Returns the jump mneumonic in the current C-Command. Only called if command type is C_COMMAND
-    std::string jmp();
+    std::string jump();
+
+    std::string toString();
 };
 
 #endif // PARSER_H

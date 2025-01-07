@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <string>
+#include <unordered_map>
 class Code {
 
     public:
