@@ -1,6 +1,5 @@
 #include "code.h"
-
-
+#include <iostream>
 const std::unordered_map<std::string, std::bitset<3>> dests = {
     {"null", std::bitset<3>("000")},
     {"M", std::bitset<3>("001")},
@@ -52,15 +51,27 @@ const std::unordered_map<std::string, std::bitset<3>> jumps = {
     {"JLE", std::bitset<3>("110")},
     {"JMP", std::bitset<3>("111")},
 };
+Code::Code() {
+    
+}
+
+
 
 std::bitset<3> Code::dest(std::string mneumonic) {
     return dests.at(mneumonic);
 }
 
 std::bitset<7> Code::comp(std::string mneumonic) {
-    if 
+    std::bitset<7> compset;
+    if ( mneumonic.find("A") == std::string::npos)
+    {
+        // operation doesn't use A, "a" bit set to 0
+        compset.set(0);
+    }
+    return compset | std::bitset<compset.size()>(comps.at(mneumonic).to_ullong());
 }
 
 std::bitset<3> Code::jump(std::string mneumonic) {
-    
+    std::cout << mneumonic << std::endl;
+    return jumps.at(mneumonic);
 }

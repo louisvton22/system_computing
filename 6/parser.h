@@ -23,6 +23,7 @@ public:
         C_COMMAND
     };
 
+    SymbolTable st;
     Parser(char* filename);
     // Checks if there are more commands in the input
     bool hasMoreCommands();
@@ -40,6 +41,9 @@ public:
     std::string jump();
 
     std::string toString();
+
+    // returns the ram address of a variable or the string representation of a decimal
+    int aValue();
 };
 
 #endif // PARSER_H

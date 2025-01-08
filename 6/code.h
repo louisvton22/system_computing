@@ -8,7 +8,6 @@ class Code {
 
     public:
         Code();
-    private:
 
         // Returns the binary copde of the dest mneumonic
         std::bitset<3> dest(std::string mneumonic);
