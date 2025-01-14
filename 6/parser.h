@@ -9,11 +9,12 @@
 #include <cctype>
 #include <iostream>
 #include "symbolTable.h"
+#include "code.h"
 #include <regex>
 class Parser {
 
 private:
-    
+    std::string binaryCommand;
 
 public:
 
@@ -44,6 +45,9 @@ public:
 
     // returns the ram address of a variable or the string representation of a decimal
     int aValue();
+
+    std::string parse();
+    std::string convertBinary();
 };
 
 #endif // PARSER_H

@@ -4,11 +4,13 @@
 #include <string>
 #include <unordered_map>
 #include <sstream>
+#include <vector>
 class SymbolTable {
 
     private:
         
         std::unordered_map<std::string, int> table;
+        std::unordered_map<std::string, std::vector<int>> lineUsage;
         int size;
     public:
         SymbolTable();
@@ -22,6 +24,10 @@ class SymbolTable {
         int getSize();
 
         std::string toString();
+
+        void addOccurrence(std::string symbol, int line);
+
+        std::vector<int> getOccurrences(std::string symbol);
 };
 
 #endif // SYMBOL_TABLE_H

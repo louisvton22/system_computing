@@ -63,15 +63,15 @@ std::bitset<3> Code::dest(std::string mneumonic) {
 
 std::bitset<7> Code::comp(std::string mneumonic) {
     std::bitset<7> compset;
-    if ( mneumonic.find("A") == std::string::npos)
+    if ( mneumonic.find("M") != std::string::npos)
     {
-        // operation doesn't use A, "a" bit set to 0
-        compset.set(0);
+        // operation uses A, "a" bit set to 1
+        compset.set(6);
     }
     return compset | std::bitset<compset.size()>(comps.at(mneumonic).to_ullong());
 }
 
 std::bitset<3> Code::jump(std::string mneumonic) {
-    std::cout << mneumonic << std::endl;
+    //std::cout << mneumonic << std::endl;
     return jumps.at(mneumonic);
 }

@@ -41,6 +41,7 @@ int SymbolTable::getSize() {
     return this->size;
 }
 
+
 std::string SymbolTable::toString() {
     std::stringstream ss; // Use stringstream to construct the string
 
@@ -58,4 +59,12 @@ std::string SymbolTable::toString() {
     result += " }";
 
     return result;
+}
+
+void SymbolTable::addOccurrence(std::string symbol, int line) {
+    this->lineUsage[symbol].push_back(line);
+}
+
+std::vector<int> SymbolTable::getOccurrences(std::string symbol) {
+    return this->lineUsage[symbol];
 }

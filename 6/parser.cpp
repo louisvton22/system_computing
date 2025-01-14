@@ -5,7 +5,7 @@ std::string line;
 
 std::ifstream file;
 unsigned int lineCount;
-
+Code coder = Code();
 Parser::Parser(char* filename) {
     file = std::ifstream(filename);
     this -> st = SymbolTable();
@@ -28,7 +28,7 @@ bool Parser::hasMoreCommands() {
 void Parser::advance() {
         while (std::getline(file, line))
         {       
-            std::cout << line << std::endl;
+            //std::cout << line << std::endl;
             line.erase(
                 std::remove_if(line.begin(), line.end(),
                                 [](char c){return std::isspace(c); }), line.end()
@@ -38,19 +38,31 @@ void Parser::advance() {
             }
             std::cout << "Non coded line. Skipping" <<  std::endl;
         }
-    lineCount++;
     // check if loop command or symbol then update symbol table
     //std::cout << commandType() << std::endl << "\n";
+    lineCount++;
+    std::cout << "Line no: " << lineCount << std::endl;
     if (commandType() == Parser::L_COMMAND) {
         if (!this->st.contains(symbol())) {
             this->st.addEntry(symbol(), lineCount);
         } else {
-            std::cout << "ERROR:: loop label already defined" << std::endl;
+
+            std::cout << "Warning:: loop label declared. Reevaluating lines." << std::endl;
+            this->st.addEntry(symbol(), lineCount);
+            for (int line : this->st.getOccurrences(symbol()))
+            {
+                // if loop command found and name already in st, go back to all lines and replace with line count 
+                std::cout << "Changing line " << line << " to binary line " << std::bitset<16>(lineCount).to_string() << std::endl; 
+                this->binaryCommand = this->binaryCommand.substr(0, 17 * (line-1)) + std::bitset<16>(lineCount).to_string() + this->binaryCommand.substr(17 * (line)-1);
+            }
         }
+        lineCount--;
+        advance();
     } else if (commandType() == Parser::A_COMMAND && std::regex_match(symbol(), std::regex (R"(^[a-zA-Z][a-zA-Z0-9]*$)"))) {
         if (!this->st.contains(symbol())) {
             this->st.addEntry(symbol(), this->st.getSize());
         }
+        this->st.addOccurrence(symbol(), lineCount);
     }
 }
 
@@ -149,5 +161,39 @@ int Parser::aValue() {
 }
 
 
+std::string Parser::parse() {
+    while (hasMoreCommands())
+    {
+        advance();
+        this->binaryCommand += convertBinary() + "\n";
+        std::cout << toString() << std::endl;
+    }
+    return this->binaryCommand;
+}
 
+std::string Parser::convertBinary() {
+    std::cout << "Converting instruction to binary." << std::endl;
+    std::string binaryCode = "";
 
+    if (commandType() == Parser::A_COMMAND)
+        {
+            // A instruction bit
+            binaryCode += "0";
+
+            // take symbol and convert to integer then binary
+            binaryCode += std::bitset<15>(aValue()).to_string();
+        } else {
+
+            // C instruction and placeholder bit 
+            binaryCode += "111";
+
+            // get comp binary translation
+            binaryCode += coder.comp(comp()).to_string();
+
+            // get binary destination only if "=" exists in mneumonic
+            binaryCode += line.find('=') == std::string::npos ? "000" : coder.dest(dest()).to_string();
+            binaryCode += coder.jump(jump()).to_string();
+        }
+    std::cout<< binaryCode << std::endl;
+    return binaryCode;
+}
