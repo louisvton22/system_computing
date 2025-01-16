@@ -13,10 +13,11 @@ int main(int argc, char* argv[] ) {
     // }
 
     std::filesystem::path fileName(argv[1]);
-    std::ofstream outfile(fileName.stem().string() + ".txt");
+    std::ofstream outfile(fileName.stem().string() + ".hack");
 
     outfile << parser.parse();
+    std::cout << parser.toString() << std::endl;
     outfile.close();
-    std::cout << "Input: " << fileName.filename().string() <<"\nOutput: " << fileName.stem().string() + ".txt" << " parsed into Hack binary." <<std::endl;
+    std::cout << "Input: " << fileName.filename().string() <<"\nOutput: " << fileName.stem().string() + ".hack" << " parsed into Hack binary." <<std::endl;
     return 0;
 }

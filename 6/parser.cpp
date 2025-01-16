@@ -4,7 +4,7 @@
 std::string line;
 
 std::ifstream file;
-unsigned int lineCount;
+unsigned int lineCount = 0;
 Code coder = Code();
 Parser::Parser(char* filename) {
     file = std::ifstream(filename);
@@ -40,30 +40,30 @@ void Parser::advance() {
         }
     // check if loop command or symbol then update symbol table
     //std::cout << commandType() << std::endl << "\n";
-    lineCount++;
     std::cout << "Line no: " << lineCount << std::endl;
+    std::cout << line << std::endl;
     if (commandType() == Parser::L_COMMAND) {
-        if (!this->st.contains(symbol())) {
-            this->st.addEntry(symbol(), lineCount);
-        } else {
-
-            std::cout << "Warning:: loop label declared. Reevaluating lines." << std::endl;
-            this->st.addEntry(symbol(), lineCount);
-            for (int line : this->st.getOccurrences(symbol()))
+        std::string loopLabel = symbol();
+        this->st.addEntry(loopLabel, lineCount);
+        advance();
+        std::cout << this->st.toString() << std::endl;
+        for (int line : this->st.getOccurrences(loopLabel))
             {
                 // if loop command found and name already in st, go back to all lines and replace with line count 
-                std::cout << "Changing line " << line << " to binary line " << std::bitset<16>(lineCount).to_string() << std::endl; 
-                this->binaryCommand = this->binaryCommand.substr(0, 17 * (line-1)) + std::bitset<16>(lineCount).to_string() + this->binaryCommand.substr(17 * (line)-1);
+                std::cout << "Changing line " << line << " to binary line " << std::bitset<16>(st.getAddress(loopLabel)).to_string() << std::endl;
+                std::string original(this->binaryCommand);
+                this->binaryCommand = original.substr(0, 17 * (line)) + std::bitset<16>(st.getAddress(loopLabel)).to_string() + original.substr((17 * (line + 1)) - 1);
             }
-        }
-        lineCount--;
-        advance();
-    } else if (commandType() == Parser::A_COMMAND && std::regex_match(symbol(), std::regex (R"(^[a-zA-Z][a-zA-Z0-9]*$)"))) {
+        lineCount = st.getAddress(loopLabel);
+    } else if (commandType() == Parser::A_COMMAND && std::regex_match(symbol(), std::regex (R"(^[a-zA-Z]\S*$)"))) {
         if (!this->st.contains(symbol())) {
+            std::cout << "Adding " << symbol() << " to symbol table." << "Address: " << this->st.getSize() << std::endl;
             this->st.addEntry(symbol(), this->st.getSize());
         }
         this->st.addOccurrence(symbol(), lineCount);
     }
+    lineCount++;
+    //std::cout << this->binaryCommand.length()  << std::endl;
 }
 
 Parser::COMMAND_TYPE Parser::commandType() {
@@ -141,7 +141,7 @@ std::string Parser::toString() {
     // str += "Destination: " + dest() + '\n';
     // str += "Compute: " + comp() + '\n';
     // str += "Jump: " + jump() + '\n';
-    // str += this->st.toString();
+    str += this->st.toString();
     return str;
 }
 
@@ -166,7 +166,7 @@ std::string Parser::parse() {
     {
         advance();
         this->binaryCommand += convertBinary() + "\n";
-        std::cout << toString() << std::endl;
+        // std::cout << toString() << std::endl;
     }
     return this->binaryCommand;
 }
