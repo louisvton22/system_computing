@@ -5,16 +5,17 @@
 #include "parser.h"
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <unordered_map>
 class Code {
     public:
-        Code();
+        Code(std::string fileName);
         //Informs the code writer that the translation of a VM file has started
         void setFileName(std::string fileName);
-        //Writes the aseembly code for an arithmetic command
+        //Writes the assembly code for an arithmetic command
         void writeArithmetic(std::string command);
         //Writes the assembly code of the given command, where command is PUSH or POP
         void WritePushPop(Parser::COMMAND_TYPE c, std::string segment, int index);
-
         //Closes the output file;
         void Close();
     private:

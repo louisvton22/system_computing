@@ -1,11 +1,12 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <regex>
 class Parser
 {
     
@@ -33,10 +34,9 @@ class Parser
         std::string arg2();
         // Returns the type of the current command from enum COMMAND_TYPE
         COMMAND_TYPE commandType();
-
+        std::string line;
     private:
         std::ifstream file;
-        std::string line;
 
 
 };
