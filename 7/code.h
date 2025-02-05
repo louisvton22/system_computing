@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <unordered_map>
+#include <filesystem>
 class Code {
     public:
         Code(std::string fileName);
@@ -20,6 +21,7 @@ class Code {
         void Close();
     private:
         std::ofstream outfile;
+        std::filesystem::path filename;
 };
 
 #endif //CODE_H

@@ -1,29 +1,49 @@
-# Compiler
-CXX = g++
+################################################################################
+# Cross-Platform Makefile for C++ Projects (Windows & Unix Compatible)
+################################################################################
 
-# Compiler flags
-CXXFLAGS = -Wall -Wextra -O2 -std=c++17
+# Detect OS (Windows or Unix)
+ifeq ($(OS), Windows_NT)
+    RM      = del /Q
+    RMDIR   = rmdir /S /Q
+    MKDIR   = if not exist $(1) mkdir $(1)
+    EXEEXT  = .exe
+else
+    RM      = rm -f
+    RMDIR   = rm -rf
+    MKDIR   = mkdir -p
+    EXEEXT  =
+endif
 
-# Find all .cpp files in the current directory
-SRCS = $(wildcard *.cpp)
+################################################################################
+# Project Configuration
+################################################################################
 
-# Convert .cpp filenames to .o object files (fixing case issue)
-OBJS = $(SRCS:.cpp=.o)
+CXX      = g++
+CXXFLAGS = -Wall -Wextra -g -std=c++17
+TARGET   = main$(EXEEXT)  # The output executable
 
-# Output executable name
-TARGET = main
+# Automatically find all .cpp files in the directory
+SRCS     = $(wildcard *.cpp)
+OBJS     = $(SRCS:.cpp=.o)
+EXTENSION = .asm
+################################################################################
+# Build Rules
+################################################################################
 
-# Default target: build the executable
+all: $(TARGET)
+
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@ 
 
-# Rule to compile each .cpp file to .o
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@ 
 
-# Clean rule to remove generated files (fixing tab issue)
 clean:
-		rm -f $(OBJS) $(TARGET)
+	$(RM) $(OBJS)
+	$(RM) $(TARGET)
+	$(RM) /S .\*.asm || exit 0
+distclean: clean
+	# Additional cleanup if needed
 
-# Ensure clean is always rebuilt when called
-.PHONY: clean
+.PHONY: all clean distclean
