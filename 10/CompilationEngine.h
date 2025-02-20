@@ -1,13 +1,16 @@
 #ifndef COMPILATION_ENGINE_H
 #define COMPILATION_ENGINE_H
 
+#include "JackTokenizer.h"
 #include <fstream>
 class CompilationEngine {
-    private:
+    public:
         
         // Gets its input from a JackTokenizer and emits its output to and output
         // file, using a set of parsing routines.
-        CompilationEngine(std::ifstream input, std::ofstream output);
+        CompilationEngine(std::string file);
+
+        std::ofstream output;
 
         // Compiles a complete class
         void compileClass();
@@ -59,8 +62,9 @@ class CompilationEngine {
         // the # of expressions in the list
         int compileExpressionList();
 
-    public:
+    private:
 
+        void process(std::string expectedToken);
 
 };
 

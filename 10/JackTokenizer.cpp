@@ -11,6 +11,7 @@ std::set<unsigned char> symbolSet = std::set<unsigned char>(
 
 JackTokenizer::JackTokenizer(std::string input) {
     this->stream = std::ifstream(input);
+    this->currentToken = "";
 }
 
 bool JackTokenizer::hasMoreTokens()
@@ -21,7 +22,6 @@ bool JackTokenizer::hasMoreTokens()
 
 void JackTokenizer::advance()
 {   char buffer;
-    currentToken = "";
     std::string line;
     while (hasMoreTokens()) {
         this->stream.get(buffer);
