@@ -9,6 +9,12 @@ std::set<unsigned char> symbolSet = std::set<unsigned char>(
     '<', '>', '=', '~'}
 );
 
+std::set<std::string> keywordSet = std::set<std::string> ( {
+    "class", "constructor", "function", "method", "field", "static",
+    "var", "int", "char", "boolean", "void", "true", "false", "null",
+    "this", "let", "do", "if", "else", "while", "return"
+});
+
 JackTokenizer::JackTokenizer(std::string input) {
     this->stream = std::ifstream(input);
     this->currentToken = "";
@@ -59,7 +65,7 @@ void JackTokenizer::advance()
         }
         // if whitespace after nonwhitespace, complete token, otherwise continue
         // until nonwhitespace encountered
-        else if (std::iswspace(buffer)) {
+        else if (std::isspace(buffer)) {
             if (currentToken.size() > 0) {
                 break;
             } else {
@@ -96,8 +102,8 @@ std::string JackTokenizer::stringVal()
     return std::string();
 }
 
-bool isSymbol() {
-   
 
-    
+JackTokenizer::TOKEN_TYPE JackTokenizer::getTokenType() {
+
 }
+

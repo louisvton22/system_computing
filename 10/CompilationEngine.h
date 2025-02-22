@@ -3,6 +3,7 @@
 
 #include "JackTokenizer.h"
 #include <fstream>
+#include <stack>
 class CompilationEngine {
     public:
         
@@ -64,7 +65,9 @@ class CompilationEngine {
 
     private:
 
-        void process(std::string expectedToken);
+        // Handles parsing token and validating it to literal or expected token type
+        template <typename... Args>
+        void process(JackTokenizer::TOKEN_TYPE type, Args... args);
 
 };
 

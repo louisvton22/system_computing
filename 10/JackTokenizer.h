@@ -6,13 +6,7 @@
 #include <cctype>
 #include <iostream>
 class JackTokenizer {
-    enum TOKEN_TYPE{
-        KEYWORD,
-        SYMBOL,
-        IDENTIFIER,
-        INT_CONST,
-        STRING_CONST    
-    };
+    
 
     enum KEYWORD {
         CLASS,
@@ -60,6 +54,16 @@ class JackTokenizer {
         std::ifstream stream;
 
         std::string currentToken;
+
+        enum TOKEN_TYPE{
+        KEYWORD,
+        SYMBOL,
+        IDENTIFIER,
+        INT_CONST,
+        STRING_CONST    
+        };
+
+        TOKEN_TYPE getTokenType();
 
     private:
 

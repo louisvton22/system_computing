@@ -1,4 +1,6 @@
 #include "CompilationEngine.h"
+#include "Rules.h"
+
 
 
 JackTokenizer tokenizer;
@@ -9,84 +11,59 @@ CompilationEngine::CompilationEngine(std::string file) {
     compileClass();
 }
 
-
-void CompilationEngine::process(std::string expectedToken) {
+template<typename... Args>
+void CompilationEngine::process(JackTokenizer::TOKEN_TYPE type, Args... args) {
     tokenizer.advance();
     std::string token = tokenizer.currentToken;
-
-    if (token == expectedToken) {
-        this->output << token << endl;
+    
+    if (tokenizer.getTokenType() == type) {
+        if ((token == args) || ...) {
+            this->output << token << endl;
+        } else {
+            cerr << "Error parsing" << endl;
+        }
     } else {
         cerr << "Error parsing" << endl; 
     }
+
 }
 
 void CompilationEngine::compileClass()
 {
     this->output << "<class>" << endl;
-    process("class")
-    verifyToken("identitfier");
-    process("{");
+    process(JackTokenizer::KEYWORD, "class");
+    process(JackTokenizer::IDENTIFIER);
+    process(JackTokenizer::SYMBOL, "{");
     compileVarDec();
     compileSubroutine();
-    process("}");
+    process(JackTokenizer::SYMBOL, "}");
     this->output << "</class>" << endl;
 }
 
 void CompilationEngine::compileClassVarDec()
 {
-
+    this->output << "<classVarDec>" << endl;
+    process(JackTokenizer::KEYWORD, "static", "field");
+    // process type rule
+    
+    // process varName rule
+    // process 0 or more varName rule
+    this->output << "</classVarDec>" << endl;
 }
 
-void CompilationEngine::compileSubroutine()
-{
-}
 
-void CompilationEngine::compileParameterList()
-{
-}
 
-void CompilationEngine::compileSubroutineBody()
-{
-}
 
-void CompilationEngine::compileVarDec()
-{
-}
+stack<unique_ptr<Token>> compilationStack = stack<unique_ptr<Token>>();
+void compile () {
+    JackTokenizer tk = JackTokenizer("Square/Main.jack");
+    compilationStack.push(make_unique<Token>(classRule()));
+    
+    while (!compilationStack.empty()) {
+        auto &const currentRule = compilationStack.top();
+        compilationStack.pop();
+        currentRule->validate(compilationStack, &tk);
+    }
 
-void CompilationEngine::compileStatements()
-{
-}
 
-void CompilationEngine::compileLet()
-{
-}
-
-void CompilationEngine::compileIf()
-{
-}
-
-void CompilationEngine::compileWhile()
-{
-}
-
-void CompilationEngine::compileDo()
-{
-}
-
-void CompilationEngine::compileReturn()
-{
-}
-
-void CompilationEngine::compileExpression()
-{
-}
-
-void CompilationEngine::compileTerm()
-{
-}
-
-int CompilationEngine::compileExpressionList()
-{
-    return 0;
 }
