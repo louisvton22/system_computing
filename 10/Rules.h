@@ -19,80 +19,106 @@ enum OCCURENCES {
 
 class Token {
     public:
+        OCCURENCES optional;
         virtual void validate(stack<unique_ptr<Token>> stack, JackTokenizer* tk) const = 0;
         // virtual void add(stack<unique_ptr<Token>> stack)
         virtual ~Token() {}
+        bool orType;
 };
 
 struct Terminal : Token {
 
     string literal;
     string tag;
-    bool optional;
-    bool moreToCompare;
+
     // vector<unique_ptr<Token>> validators;
     JackTokenizer::TOKEN_TYPE type;
 
     // moreToCompare: Used if token can be this | that. true indicates there's more values the token needs to compare
     // note: may not need tag
     //template<typename... Tokens>
-    Terminal(bool optional, JackTokenizer::TOKEN_TYPE type, string literal, bool moreToCompare)
-            : literal(literal), optional(optional), type(type), moreToCompare(moreToCompare) {};
-    Terminal(bool optional, JackTokenizer::TOKEN_TYPE type, bool moreToCompare)
-            : optional(optional), type(type), literal(""), moreToCompare(moreToCompare){};
+    Terminal(OCCURENCES optional, JackTokenizer::TOKEN_TYPE type, string literal, bool orType)
+            : literal(literal), type(type) {optional = optional; orType = orType;};
+    Terminal(OCCURENCES optional, JackTokenizer::TOKEN_TYPE type, bool orType)
+            : type(type), literal("") {Token::optional = optional; Token::orType = orType;};
     // need access to stack
     void validate(stack<unique_ptr<Token>> stack, JackTokenizer* tk) const override {
-        tk->advance();
-        if (literal == tk->currentToken) {
-            // print <tag>
-            cout << "<" << terminalTags[tk->getTokenType()] << ">" << endl;
-            // print currentToken
-            cout << tk->currentToken << endl;
-            // print </tag>
-            cout << "</" << terminalTags[tk->getTokenType()] << ">" << endl;
-            // remove all uneeded tokens from stack
-        } else if (!moreToCompare) {
-            // error
-            cerr << "An error occured" << endl;
-        } else if (moreToCompare) {
-            return;
-        }
+            if (literal == tk->currentToken) {
+                // print <tag>
+                cout << "<" << terminalTags[tk->getTokenType()] << ">" << endl;
+                // print currentToken
+                cout << tk->currentToken << endl;
+                // print </tag>
+                cout << "</" << terminalTags[tk->getTokenType()] << ">" << endl;
+                // TODO: remove tokens until null it reached
+                while (stack.top() != NULL) {
+                    stack.pop();
+                }
+            } else {
+                // handle occurences cases
+                switch (optional) {
+                    case(ONE):
+                        // error
+                        cerr << "An error occured" << endl;
+
+                        
+                }
+                
+            }
     }
 
 };
 
-struct OrToken : Terminal {
+// Handles the grouping of rules that the current token can be equal to
+struct OrToken : NonTerminal {
+    public:
+        vector<unique_ptr<Token>> group;
 
+        template<typename... Args>
+        OrToken(Args... args) {
+            (group.push_back(std::forward<Args>(args)), ...);
+        }
+
+        void validate(stack<unique_ptr<Token>> stack, JackTokenizer* tk) const override {
+            NonTerminal::validate(stack, tk);
+        }
 };
 
 struct NonTerminal : Token {
     public:
         
         string tag;
-        bool optional;
         vector<unique_ptr<Token>> children;
+
         // OCCURENCES occurences;
-        NonTerminal(string tag, bool optional, vector<unique_ptr<Token>> children)
-            : tag(tag), optional(optional), children(children) {};
+        NonTerminal(string tag, OCCURENCES optional, vector<unique_ptr<Token>> children, bool orType)
+            : tag(tag), children(children) {Token::optional = optional; Token::orType = orType;};
 
         void validate(stack<unique_ptr<Token>> stack, JackTokenizer* tk) const override {
-            // print <tag>
-            // go through list of children and add them to stack, and call validate on them
-            for (unsigned int i = children.size(); i >= 0 ; i--) {
-                stack.push(children[i]);
-            } 
-            // print </tag>
+            // add a null token to separate rule
+            for (const auto& child : children) {
+                stack.push(child);
+            }
         }
+
 };
 
 struct classRule : public NonTerminal {
     vector<unique_ptr<Token>> children = {
-        make_unique<Token>(Terminal(false, JackTokenizer::KEYWORD, "class", false))
-    
+        make_unique<Token>(Terminal(ONE, JackTokenizer::KEYWORD, "class")),
+        make_unique<Token>(classNameRule()),
+        make_unique<Token>(Terminal(ONE, JackTokenizer::KEYWORD, "{")),
+
         };
-    classRule() : NonTerminal("class", false, children) {
-        
+    classRule() : NonTerminal("class", ONE, children, false) {
+        // print <tag> 
+        // call super 
+        // print </tag>
+    };
+    void validate(stack<unique_ptr<Token>> stack, JackTokenizer* tk) const override{
+        NonTerminal::validate(stack, tk);
     }
+
 }; 
 
 struct classNameRule : public NonTerminal {
@@ -101,7 +127,7 @@ struct classNameRule : public NonTerminal {
 };
 
 struct identifierRule : public Terminal {
-    identifierRule() : Terminal(false, JackTokenizer::IDENTIFIER, false){};
+    identifierRule() : Terminal(ONE, JackTokenizer::IDENTIFIER, false){};
     void validate(stack<unique_ptr<Token>> stack, JackTokenizer* tk) const override{
 
     }
